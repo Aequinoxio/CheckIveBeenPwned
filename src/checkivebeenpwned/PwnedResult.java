@@ -6,7 +6,7 @@
 package checkivebeenpwned;
 
 /**
- *
+ * Classe per incapsulare le risposte del server relative all'account testato
  * @author utente
  */
 public class PwnedResult {

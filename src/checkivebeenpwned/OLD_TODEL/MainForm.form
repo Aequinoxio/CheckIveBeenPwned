@@ -30,14 +30,10 @@
                   <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="btnCheckPwned" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btnStopSearch" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="lblCheckingAccount" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="lblCounterAccountNumber" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lblDi" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lblMaxAccountNumber" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -58,10 +54,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCheckPwned" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblMaxAccountNumber" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblDi" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblCounterAccountNumber" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblCheckingAccount" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnStopSearch" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jScrollPane2" pref="267" max="32767" attributes="0"/>
@@ -117,34 +111,18 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblMaxAccountNumber">
       <Properties>
-        <Property name="text" type="java.lang.String" value="-"/>
+        <Property name="text" type="java.lang.String" value="000000"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblDi">
+    <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
         <Property name="text" type="java.lang.String" value="di"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblCounterAccountNumber">
       <Properties>
-        <Property name="text" type="java.lang.String" value="-"/>
+        <Property name="text" type="java.lang.String" value="00000"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblCheckingAccount">
-      <Properties>
-        <Property name="horizontalAlignment" type="int" value="11"/>
-        <Property name="text" type="java.lang.String" value=" "/>
-        <Property name="alignmentX" type="float" value="1.0"/>
-        <Property name="horizontalTextPosition" type="int" value="4"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="btnStopSearch">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Stop"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnStopSearchActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>

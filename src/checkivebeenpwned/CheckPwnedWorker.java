@@ -5,6 +5,7 @@
  */
 package checkivebeenpwned;
 
+import checkivebeenpwned.OLD_TODEL.PwnedEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

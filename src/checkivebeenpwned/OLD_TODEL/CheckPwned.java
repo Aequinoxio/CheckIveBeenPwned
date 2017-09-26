@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package checkivebeenpwned;
+package checkivebeenpwned.OLD_TODEL;
 
+import checkivebeenpwned.NetworkProxy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

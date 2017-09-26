@@ -6,8 +6,11 @@
 package checkivebeenpwned;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,14 +18,25 @@ import java.util.logging.Logger;
  *
  * @author GLLGRL68H26H282H
  */
-public class MainForm extends javax.swing.JFrame implements PwnedEvent {
+public class MainForm extends javax.swing.JFrame {
 
-    CheckPwned checkPwned;
+    CheckPwnedWorker checkPwnedWorker;
+    Proxy proxy;
+
     /**
      * Creates new form MainForm
      */
     public MainForm() {
         initComponents();
+        btnStopSearch.setEnabled(false);
+
+        startNetworking();
+    }
+
+    private void startNetworking() {
+        NetworkProxy np = new NetworkProxy();
+        np.init();
+        proxy = np.getNetworkProxy();
     }
 
     /**
@@ -41,8 +55,10 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
         txtResult = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
         lblMaxAccountNumber = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        lblDi = new javax.swing.JLabel();
         lblCounterAccountNumber = new javax.swing.JLabel();
+        lblCheckingAccount = new javax.swing.JLabel();
+        btnStopSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,11 +80,23 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Incolla l'elenco degli account da controllare su haveibeenpwned.com");
 
-        lblMaxAccountNumber.setText("000000");
+        lblMaxAccountNumber.setText("-");
 
-        jLabel3.setText("di");
+        lblDi.setText("di");
 
-        lblCounterAccountNumber.setText("00000");
+        lblCounterAccountNumber.setText("-");
+
+        lblCheckingAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        lblCheckingAccount.setText(" ");
+        lblCheckingAccount.setAlignmentX(1.0F);
+        lblCheckingAccount.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+
+        btnStopSearch.setText("Stop");
+        btnStopSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopSearchActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -81,10 +109,14 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCheckPwned)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnStopSearch)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblCheckingAccount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblCounterAccountNumber)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
+                        .addComponent(lblDi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblMaxAccountNumber))
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -101,8 +133,10 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCheckPwned)
                     .addComponent(lblMaxAccountNumber)
-                    .addComponent(jLabel3)
-                    .addComponent(lblCounterAccountNumber))
+                    .addComponent(lblDi)
+                    .addComponent(lblCounterAccountNumber)
+                    .addComponent(lblCheckingAccount)
+                    .addComponent(btnStopSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
                 .addContainerGap())
@@ -113,26 +147,67 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
 
     private void btnCheckPwnedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckPwnedActionPerformed
         txtResult.setText("");
-        try {
-            if (checkPwned==null){
-                checkPwned = new CheckPwned(this);
-                checkPwned.init();
-            }
-            
-            String accounts=txtAccounts.getText();
-            String[] temp = accounts.split("\n");
-            ArrayList<String> testingAccounts= new ArrayList<String>(Arrays.asList(temp));
-            
-            lblMaxAccountNumber.setText(String.valueOf(testingAccounts.size()));
-            
-            checkPwned.checkAccounts(testingAccounts);
-        } catch (IOException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        String accounts = txtAccounts.getText().trim();
+
+        if ("".equals(accounts)) {
+            return;
         }
+        String[] temp = accounts.split("\n");
+        ArrayList<String> testingAccounts = new ArrayList<String>(Arrays.asList(temp));
+
+        btnCheckPwned.setEnabled(false);
+        btnStopSearch.setEnabled(true);
+
+        if (checkPwnedWorker != null) {
+            checkPwnedWorker.cancel(true);
+        }
+        
+        checkPwnedWorker = new CheckPwnedWorker(testingAccounts, proxy) {
+            @Override
+            protected void done() {
+                super.done(); //To change body of generated methods, choose Tools | Templates.
+                try {
+                    List<String> result = get();
+                    txtResult.setText("");
+                    for (String s : result) {
+                        txtResult.append(s + "\n");
+                    }
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                btnCheckPwned.setEnabled(true);
+                btnStopSearch.setEnabled(false);
+                lblCheckingAccount.setText("");
+                lblCounterAccountNumber.setText("-");
+                lblMaxAccountNumber.setText("-");
+            }
+
+            private int counterAccountDone = 0;
+
+            @Override
+            protected void process(List<PwnedResult> chunks) {
+                lblCounterAccountNumber.setText(String.valueOf(++counterAccountDone));
+                txtResult.append(chunks.get(0).ACCOUNT + "\n");
+                for (PwnedResult PR : chunks) {
+                    lblCheckingAccount.setText(PR.ACCOUNT);
+                    txtResult.append(PR.SERVER_REULT + "\n");
+                }
+            }
+        };
+
+        lblMaxAccountNumber.setText(String.valueOf(testingAccounts.size()));
+        lblCounterAccountNumber.setText("0");
+        checkPwnedWorker.execute();
 
     }//GEN-LAST:event_btnCheckPwnedActionPerformed
+
+    private void btnStopSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopSearchActionPerformed
+
+        checkPwnedWorker.stopSearch();
+        btnCheckPwned.setEnabled(true);
+        btnStopSearch.setEnabled(false);
+    }//GEN-LAST:event_btnStopSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -160,6 +235,9 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -171,18 +249,20 @@ public class MainForm extends javax.swing.JFrame implements PwnedEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCheckPwned;
+    private javax.swing.JButton btnStopSearch;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblCheckingAccount;
     private javax.swing.JLabel lblCounterAccountNumber;
+    private javax.swing.JLabel lblDi;
     private javax.swing.JLabel lblMaxAccountNumber;
     private javax.swing.JTextArea txtAccounts;
     private javax.swing.JTextArea txtResult;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void DoAction(String testo) {
-        txtResult.append(testo+"\n");
-    }
+//    @Override
+//    public void DoAction(String testo) {
+//        txtResult.append(testo + "\n");
+//    }
 }
