@@ -35,7 +35,7 @@ public class NetworkProxy {
             System.setProperty("http.proxyPort", "" + port);
 
         }
-        System.setProperty("java.net.useSystemProxies", "false");
+        System.setProperty("java.net.useSystemProxies", "false");        
     }
 
     public String getHost() {

@@ -8,6 +8,8 @@ package checkivebeenpwned.OLD_TODEL;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  *
@@ -28,11 +30,18 @@ public class TestProxy implements PwnedEvent{
         testingAccounts.add("procava@gmail.com");
         testingAccounts.add("procava1@gmail.com");
 
+        Properties properties = System.getProperties();
+        
+        for (Object s : properties.keySet()){
+            System.out.println(s.toString() + " - " + properties.getProperty((String)s) );
+        }
+        
+        
         TestProxy tp=new TestProxy();
         
-        CheckPwned cp = new CheckPwned(tp);
-        cp.init();
-        cp.checkAccounts(testingAccounts);
+//        CheckPwned cp = new CheckPwned(tp);
+//        cp.init();
+//        cp.checkAccounts(testingAccounts);
     } 
 
     @Override
