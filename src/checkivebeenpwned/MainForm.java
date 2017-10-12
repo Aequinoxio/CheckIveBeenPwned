@@ -61,6 +61,7 @@ public class MainForm extends javax.swing.JFrame {
         btnStopSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("CheckIveBeenPwned");
 
         txtAccounts.setColumns(20);
         txtAccounts.setRows(5);
